@@ -8,6 +8,7 @@ import { fetchCart } from "../../../../reduxSystem/slices/getUserCartSlice";
 import { resetisProductAdded } from "../../../../reduxSystem/slices/backAddToCartSlice";
 import { resetisProdDeleted } from "../../../../reduxSystem/slices/deleteCartProdSlice";
 import { resetEditCartState } from "../../../../reduxSystem/slices/updataCartSlice";
+import { resetIsCartCleared } from "../../../../reduxSystem/slices/clearUserCartSlice";
 
 const Cart = () => {
   const [openMenu, setOpenMenu] = useState(false);
@@ -21,14 +22,16 @@ const Cart = () => {
   const { isProductAdded } = useSelector((state) => state.AddToCartState);
   const { isProdDeleted } = useSelector((state) => state.deleteProdCart);
   const { isEdited } = useSelector((state) => state.editCartState);
+  const { isCartCleared } = useSelector((state) => state.clearCartState);
 
   useEffect(() => {
     dispatch(fetchCart()).then(() => {
       dispatch(resetisProductAdded());
       dispatch(resetisProdDeleted());
       dispatch(resetEditCartState());
+      dispatch(resetIsCartCleared());
     });
-  }, [isProductAdded, isProdDeleted, isEdited]);
+  }, [isProductAdded, isProdDeleted, isEdited, isCartCleared]);
 
   return (
     <div className="relative">

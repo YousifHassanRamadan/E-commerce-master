@@ -10,6 +10,7 @@ import { useState } from "react";
 import { updateCartItem } from "../reduxSystem/slices/updataCartSlice";
 import { Link } from "react-router-dom";
 import PlaceOrder from "../components/PlaceOrder/PlaceOrder";
+import { clearCart } from "../reduxSystem/slices/clearUserCartSlice";
 
 const CartItem = ({ item }) => {
   const [quantity, setQuantity] = useState(item.quantity);
@@ -84,6 +85,8 @@ const CartItem = ({ item }) => {
 const CartPage = () => {
   const [isPlaceOrderOpen, setIsPlaceOrderOpen] = useState(false);
 
+  const dispatch = useDispatch();
+
   const { userCart, totalCartPrice } = useSelector(
     (state) => state.getCartState
   );
@@ -103,6 +106,16 @@ const CartPage = () => {
       <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 text-[#284980]">
         Shopping Cart
       </h1>
+
+      {userCart.length > 0 && (
+        <button
+          onClick={() => dispatch(clearCart())}
+          className="flex items-center text-red-600 hover:text-red-800 text-lg font-semibold mb-4"
+        >
+          <FaTrashAlt className="mr-2" /> Clear Cart
+        </button>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <div className="sm:col-span-2">
           {userCart.length > 0 ? (

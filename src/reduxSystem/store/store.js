@@ -29,6 +29,9 @@ import { singleProductState } from "../slices/getSingleProdSlice";
 import { addRevState } from "../slices/addReviewSLice";
 import { deleteReviewState } from "../slices/deleteReviewSlice";
 import { reviewState } from "../slices/editReviewSlice";
+import { placeOrderState } from "../slices/addPlaceOrderSlice";
+import { ordersUserState } from "../slices/getUserOrderSlice";
+import { clearCartState } from "../slices/clearUserCartSlice";
 
 const store = configureStore({
   reducer: {
@@ -62,6 +65,9 @@ const store = configureStore({
     addRevState,
     deleteReviewState,
     reviewState,
+    placeOrderState,
+    ordersUserState,
+    clearCartState,
   },
 });
 
