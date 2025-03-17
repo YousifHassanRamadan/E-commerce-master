@@ -13,7 +13,9 @@ import { useSelector } from "react-redux";
 
 const SecondSection = () => {
   const { t } = useTranslation();
+
   const [isHovered, setIsHovered] = useState(false);
+
   const { favourites } = useSelector((state) => state.favouriteState);
 
   return (

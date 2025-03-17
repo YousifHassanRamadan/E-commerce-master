@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const CategoryiesAPI = "http://localhost:3000/admin/categories";
+const CategoryiesAPI = "http://localhost:3000/products/categories/list";
 
 const initialState = {
   Allcategories: [],
@@ -14,9 +14,6 @@ export const getAllCategory = createAsyncThunk(
     try {
       const response = await fetch(CategoryiesAPI, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       });
 
       if (!response.ok) {

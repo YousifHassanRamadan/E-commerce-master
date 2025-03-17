@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, MenuHandler, MenuList, Button } from "@material-tailwind/react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCategory } from "../../../../reduxSystem/slices/getAllCategorySlice";
 
 const BrowseCollection = () => {
   const { t } = useTranslation();
+
   const [openMenu, setOpenMenu] = useState(false);
+
+  const dispatch = useDispatch();
+
+  // const { Allcategories } = useSelector((state) => state.getCategoryState);
+
+  // useEffect(() => {
+  //   dispatch(getAllCategory());
+  // }, [dispatch]);
+
+  // console.log("Allcategories", Allcategories);
 
   const categories = [
     {

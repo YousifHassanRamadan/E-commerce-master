@@ -18,18 +18,31 @@ const CartItem = ({ item }) => {
   const inc = () => {
     const newQuantity = quantity + 1;
     setQuantity(newQuantity);
-    dispatch(
-      updateCartItem({ productId: item.productId, quantity: newQuantity })
-    );
+
+    if (item.variantInfo?.color) {
+      dispatch(
+        updateCartItem({ variantId: item.variantId, quantity: newQuantity })
+      );
+    } else {
+      dispatch(
+        updateCartItem({ productId: item.productId, quantity: newQuantity })
+      );
+    }
   };
 
   const dec = () => {
     if (quantity >= 1) {
       const newQuantity = quantity - 1;
       setQuantity(newQuantity);
-      dispatch(
-        updateCartItem({ productId: item.productId, quantity: newQuantity })
-      );
+      if (item.variantInfo?.color) {
+        dispatch(
+          updateCartItem({ variantId: item.variantId, quantity: newQuantity })
+        );
+      } else {
+        dispatch(
+          updateCartItem({ productId: item.productId, quantity: newQuantity })
+        );
+      }
     }
   };
 

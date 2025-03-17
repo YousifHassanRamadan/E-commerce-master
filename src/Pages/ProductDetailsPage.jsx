@@ -31,6 +31,20 @@ const ProductDetailsPage = () => {
     (state) => state.singleProductState
   );
 
+  const [selectedColor, setSelectedColor] = useState(
+    product?.variants[0]?.color || null
+  );
+
+  const [selectedSize, setSelectedSize] = useState(
+    product?.variants[0]?.size || null
+  );
+
+  const [variantPrice, setVariantPrice] = useState(
+    product?.variants[0]?.price || 0
+  );
+
+  const offerPercentage = product?.offer?.discountPercentage || 0;
+
   const { userData } = useSelector((state) => state.authState);
 
   const [mainImage, setMainImage] = useState("");
@@ -42,6 +56,8 @@ const ProductDetailsPage = () => {
 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  const [variantImg, setVariantImg] = useState(product?.variant?.images || []);
+
   useEffect(() => {
     if (id) {
       dispatch(fetchSingleProduct(id));
@@ -52,12 +68,18 @@ const ProductDetailsPage = () => {
     if (product?.thumbnail) {
       setMainImage(product.thumbnail);
     }
+
+    if (product?.variants) {
+      setSelectedColor(product?.variants[0]?.color || null);
+      setSelectedSize(product?.variants[0]?.size || null);
+      setVariantPrice(product?.variants[0]?.price || 0);
+    }
   }, [product]);
 
   const handleAddToCart = (prod) => {
     const token = localStorage.getItem("token");
 
-    // console.log("selectedProduct id", selectedProduct._id);
+    const addTocartObj = {};
 
     if (!token) {
       Swal.fire({
@@ -70,15 +92,43 @@ const ProductDetailsPage = () => {
       return;
     }
 
-    dispatch(addToCartApi([{ productId: prod._id, quantity: quantity }]));
+    if (prod.variants.length > 0) {
+      const selectedVariant = prod.variants.filter(
+        (variant) =>
+          variant.color === selectedColor &&
+          variant.size === selectedSize &&
+          variant.price === variantPrice
+      );
 
-    Swal.fire({
-      title: "Added!",
-      text: `${prod.title} has been added to the cart 🛒`,
-      icon: "success",
-      confirmButtonText: "OK",
-      timer: 2000,
-    });
+      // Check if at least one variant exists
+      if (selectedVariant.length > 0) {
+        const variantId = selectedVariant[0]._id; // Access the first matched variant
+        addTocartObj.variantId = variantId;
+        addTocartObj.quantity = quantity; // Add it to the object
+      }
+
+      // console.log("selectedVariant", selectedVariant);
+
+      console.log("with variant");
+
+      dispatch(addToCartApi([addTocartObj]));
+    } else {
+      addTocartObj.productId = prod._id;
+      addTocartObj.quantity = quantity;
+      console.log("without variant");
+
+      dispatch(addToCartApi([addTocartObj]));
+    }
+
+    // console.log("addTocartObj", addTocartObj);
+
+    // Swal.fire({
+    //   title: "Added!",
+    //   text: `${prod.title} has been added to the cart 🛒`,
+    //   icon: "success",
+    //   confirmButtonText: "OK",
+    //   timer: 2000,
+    // });
   };
 
   const handleAddReview = () => {
@@ -123,7 +173,35 @@ const ProductDetailsPage = () => {
     });
   };
 
-  console.log("userData", userData);
+  useEffect(() => {
+    if (selectedColor) {
+      const selectedVariant = product?.variants?.find(
+        (variant) => variant.color === selectedColor
+      );
+      if (selectedVariant?.images?.length) {
+        setVariantImg(selectedVariant.images);
+      } else {
+        setVariantImg([]);
+      }
+    }
+  }, [selectedColor, product]);
+
+  useEffect(() => {
+    if (selectedColor && selectedSize) {
+      const selectedVariant = product?.variants?.find(
+        (variant) =>
+          variant.color === selectedColor && variant.size === selectedSize
+      );
+
+      if (selectedVariant?.price) {
+        setVariantPrice(selectedVariant.price);
+      } else {
+        setVariantPrice(product?.price || 0); // السعر الأساسي إذا لم يتم العثور على المتغير
+      }
+    }
+  }, [selectedColor, selectedSize, product]);
+
+  console.log("product", product);
 
   if (isLoading) {
     return (
@@ -139,7 +217,7 @@ const ProductDetailsPage = () => {
         <CardHeader className="w-full md:w-1/2 h-72 md:h-auto">
           <img
             src={mainImage}
-            alt={product?.title}
+            alt={product?.title || "Product Image"}
             className="w-full h-full object-cover"
           />
         </CardHeader>
@@ -149,23 +227,119 @@ const ProductDetailsPage = () => {
             variant="h5"
             className="font-bold text-[#284980] text-3xl"
           >
-            {product?.title}
+            {product?.title || "Loading..."}
           </Typography>
           <Typography className="text-gray-600 mt-2">
-            {product?.description}
+            {product?.description || "No description available."}
           </Typography>
           <div className="border-t border-gray-300 my-4"></div>
 
           <Typography className="text-gray-700 font-semibold">
-            Category: {product?.category?.name}
+            Category: {product?.category?.name || "Unknown"}
           </Typography>
 
+          {/* عرض الألوان المتاحة بدون تكرار */}
+          {selectedColor && (
+            <div className="mt-4">
+              <Typography className="font-semibold">
+                Available Colors:
+              </Typography>
+              <div className="flex gap-2 mt-2">
+                {[
+                  ...new Set(
+                    product?.variants?.map((variant) => variant.color)
+                  ),
+                ].map((color, index) => (
+                  <button
+                    key={index}
+                    className={`w-8 h-8 rounded-full border-2 ${
+                      selectedColor === color
+                        ? "border-black"
+                        : "border-gray-300"
+                    }`}
+                    style={{ backgroundColor: color.toLowerCase() }}
+                    onClick={() => {
+                      setSelectedColor(color);
+                      setSelectedSize(null); // إعادة تعيين الحجم عند تغيير اللون
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedColor && (
+            <div className="mt-4">
+              <Typography className="font-semibold">Select Size:</Typography>
+              <div className="flex gap-2 mt-2">
+                {product?.variants
+                  ?.filter((variant) => variant.color === selectedColor)
+                  .map((variant, index) => (
+                    <button
+                      key={index}
+                      className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold ${
+                        selectedSize === variant.size
+                          ? "bg-[#284980] text-white"
+                          : "bg-gray-100"
+                      }`}
+                      onClick={() => setSelectedSize(variant.size)}
+                    >
+                      {variant.size}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* عرض المخزون عند اختيار حجم */}
+          {selectedSize && (
+            <Typography
+              className={` mt-2 ${
+                product?.variants?.find(
+                  (variant) =>
+                    variant.color === selectedColor &&
+                    variant.size === selectedSize &&
+                    variant.stock >= 1
+                )
+                  ? "text-[#4CAF50]"
+                  : "text-red-500"
+              }`}
+            >
+              Available Stock:{" "}
+              <span
+                className={` ${
+                  product?.variants?.find(
+                    (variant) =>
+                      variant.color === selectedColor &&
+                      variant.size === selectedSize &&
+                      variant.stock >= 1
+                  )
+                    ? "text-[#4CAF50]"
+                    : "text-red-500"
+                }`}
+              >
+                {product?.variants?.find(
+                  (variant) =>
+                    variant.color === selectedColor &&
+                    variant.size === selectedSize
+                )?.stock || 0}
+              </span>
+            </Typography>
+          )}
+
           <div className="mt-4 bg-gray-100 p-4 rounded-lg">
-            <Typography className="line-through text-gray-500">
-              {product?.price}$
+            <Typography className="text-lg text-gray-500 line-through">
+              $
+              {product?.variants?.length > 0
+                ? variantPrice.toFixed(2)
+                : product?.price.toFixed(2)}
             </Typography>
             <Typography className="text-xl font-bold text-green-600">
-              ${product?.price}
+              $
+              {(
+                variantPrice - (variantPrice * offerPercentage) / 100 ||
+                product.price - (product.price * offerPercentage) / 100
+              ).toFixed(2)}
             </Typography>
             <Typography className="text-sm text-gray-500">
               Inclusive of taxes
@@ -199,19 +373,20 @@ const ProductDetailsPage = () => {
             </Button>
           </div>
 
-          {/* Images */}
           <div className="mt-6 flex gap-2 overflow-x-auto">
-            {[product.thumbnail, ...product.images].map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Product thumbnail ${index}`}
-                className={`w-16 h-16 object-cover border-2 rounded-lg cursor-pointer transition ${
-                  mainImage === img ? "border-[#284980]" : "border-gray-300"
-                }`}
-                onClick={() => setMainImage(img)}
-              />
-            ))}
+            {[product.thumbnail, ...product.images, ...variantImg].map(
+              (img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Product variant ${index}`}
+                  className={`w-16 h-16 object-cover border-2 rounded-lg cursor-pointer transition ${
+                    mainImage === img ? "border-[#284980]" : "border-gray-300"
+                  }`}
+                  onClick={() => setMainImage(img)}
+                />
+              )
+            )}
           </div>
         </CardBody>
       </Card>
@@ -269,13 +444,13 @@ const ProductDetailsPage = () => {
             >
               {/* أفاتار يحتوي على أول حرف من الاسم */}
               <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 text-white text-lg font-bold">
-                {review.userId.fname.charAt(0).toUpperCase()}
+                {review?.userId?.fname?.charAt(0).toUpperCase()}
               </div>
 
               {/* تفاصيل المراجعة */}
               <div className="flex-1">
                 <Typography className="text-lg font-semibold text-gray-800">
-                  {review.userId.fname} {review.userId.lname}
+                  {review?.userId?.fname} {review?.userId?.lname}
                 </Typography>
                 <p className="text-gray-700">{review.comment}</p>
                 <div className="text-yellow-500 font-bold">
@@ -287,7 +462,7 @@ const ProductDetailsPage = () => {
               </div>
 
               {/* أزرار التعديل والحذف بأيقونات */}
-              {userData._id === review.userId._id && (
+              {userData?._id === review.userId?._id && (
                 <div className="flex gap-2 absolute right-4 top-4">
                   <button
                     onClick={() => setIsEditOpen(true)}

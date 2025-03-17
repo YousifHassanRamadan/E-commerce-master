@@ -30,6 +30,7 @@ import { fetchUserData } from "../../reduxSystem/slices/authSlice";
 import { getAllProducts } from "../../reduxSystem/slices/getAllProductsSlice";
 import { fetchCart } from "../../reduxSystem/slices/getUserCartSlice";
 import { fetchUserAddress } from "../../reduxSystem/slices/GetUserAddressSlice";
+import { getAllCategory } from "../../reduxSystem/slices/getAllCategorySlice";
 
 const HomeContent = ({ products }) => {
   const { t } = useTranslation();
@@ -38,13 +39,15 @@ const HomeContent = ({ products }) => {
 
   useEffect(() => {
     dispatch(fetchUserAddress());
+    dispatch(getAllCategory());
+    dispatch(fetchCart());
   }, []);
 
   const { userAddress, isAddress } = useSelector(
     (state) => state.userAddressState
   );
 
-  console.log("userAddress", userAddress);
+  // console.log("userAddress", userAddress);
 
   const { isRTL } = useSelector((state) => state.RTLState);
 
@@ -69,10 +72,6 @@ const HomeContent = ({ products }) => {
   useEffect(() => {
     dispatch(getAllProducts());
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, []);
 
   return (
     <Container maxWidth="xl" className="mt-10">

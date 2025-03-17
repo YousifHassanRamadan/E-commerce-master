@@ -23,7 +23,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="bg-[#f2f2f2] min-h-screen p-8">
+    <div className="bg-[#f2f2f2] w-full min-h-screen p-8">
       <h2 className="text-3xl font-bold text-[#284980] mb-6 text-center">
         {t("My Orders")}
       </h2>

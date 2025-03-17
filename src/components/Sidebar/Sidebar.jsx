@@ -7,12 +7,14 @@ import {
   FaUserCog,
   FaSignOutAlt,
   FaExpeditedssl,
+  FaUserEdit,
 } from "react-icons/fa";
 import { fakeProfile } from "../../../assets/images";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../reduxSystem/slices/authSlice";
+import { LuUserPen } from "react-icons/lu";
 
 const Sidebar = () => {
   const { t } = useTranslation();
@@ -21,15 +23,19 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   // Debugging: Log userData to see what it holds
-  // console.log("User Data:", userData);
+  console.log("User Data:", userData);
 
   // Check if user is admin safely
-  const isAdmin = userData?.fname?.toLowerCase() === "admin";
+  const isAdmin = userData?.userType?.toLowerCase() === "admin";
+
+  const isSuperAdmin = userData?.userType.toLowerCase() === "superadmin";
+
+  console.log("isSuperAdmin", isSuperAdmin);
 
   // Define menu items dynamically
   const menuItems = useMemo(
     () => [
-      ...(isAdmin
+      ...(isAdmin || isSuperAdmin
         ? [
             {
               name: t("allProducts"),
@@ -38,8 +44,16 @@ const Sidebar = () => {
             },
           ]
         : []),
+      ...(isAdmin || isSuperAdmin
+        ? [
+            {
+              name: t("Super Admin Panel "),
+              icon: <FaUserEdit className="text-lg" />,
+              path: "manageuser",
+            },
+          ]
+        : []),
       { name: t("orders"), icon: <FaBox />, path: "orders" },
-      { name: t("trackingOrders"), icon: <FaSearch />, path: "tracking" },
       { name: t("wishlist"), icon: <FaHeart />, path: "mywishlist" },
       { name: t("addresses"), icon: <FaMapMarkerAlt />, path: "edit-address" },
       { name: t("accountDetails"), icon: <FaUserCog />, path: "edit-account" },

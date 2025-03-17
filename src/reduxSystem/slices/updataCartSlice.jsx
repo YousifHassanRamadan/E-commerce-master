@@ -5,7 +5,7 @@ const updateCartApi = "http://localhost:3000/user/cart/update-cart";
 // دالة تحديث المنتج في السلة
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
-  async ({ productId, quantity }, { rejectWithValue }) => {
+  async ({ productId, variantId, quantity }, { rejectWithValue }) => {
     try {
       // جلب التوكن من الـ localStorage
       const token = localStorage.getItem("token");
@@ -14,6 +14,10 @@ export const updateCartItem = createAsyncThunk(
         throw new Error("No authentication token found.");
       }
 
+      const bodyData = variantId
+        ? { variantId, quantity }
+        : { productId, quantity };
+
       // إرسال الطلب للتحديث
       const response = await fetch(updateCartApi, {
         method: "PUT",
@@ -21,7 +25,7 @@ export const updateCartItem = createAsyncThunk(
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, // إرسال التوكن في الهيدرز
         },
-        body: JSON.stringify({ productId, quantity }), // إرسال الـ ID والكمية الجديدة
+        body: JSON.stringify(bodyData), // إرسال الـ ID والكمية الجديدة
       });
 
       const data = await response.json();

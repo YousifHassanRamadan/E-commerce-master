@@ -32,6 +32,18 @@ import { reviewState } from "../slices/editReviewSlice";
 import { placeOrderState } from "../slices/addPlaceOrderSlice";
 import { ordersUserState } from "../slices/getUserOrderSlice";
 import { clearCartState } from "../slices/clearUserCartSlice";
+import { getAllUsersState } from "../slices/getAllUsersSlice";
+import { setAdminState } from "../slices/editRoleUsersSlice";
+import { removeAdminState } from "../slices/removeAdminSlice";
+import { deleteUserState } from "../slices/deleteUserSlice";
+import { banUserState } from "../slices/banUserSlice";
+import { dashboardStatsState } from "../slices/getDashboardStatusSlice";
+import { salesReportState } from "../slices/getSalesReportSlice";
+import { variantState } from "../slices/addVariantSlice";
+import { discountState } from "../slices/addOfferSlice";
+import { getProdVariantState } from "../slices/getEditProductVariantSLice";
+import { editProdVariantState } from "../slices/editVariantProductSlice";
+import { deleteProdVariantState } from "../slices/deleteProductVariantSlice";
 
 const store = configureStore({
   reducer: {
@@ -68,6 +80,18 @@ const store = configureStore({
     placeOrderState,
     ordersUserState,
     clearCartState,
+    getAllUsersState,
+    setAdminState,
+    removeAdminState,
+    deleteUserState,
+    banUserState,
+    dashboardStatsState,
+    salesReportState,
+    variantState,
+    discountState,
+    getProdVariantState,
+    editProdVariantState,
+    deleteProdVariantState,
   },
 });
 
